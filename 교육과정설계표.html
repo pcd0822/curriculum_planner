@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개인별 교육과정 설계표</title>
+    <!-- Tailwind CSS 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter) 로드 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- html2canvas 라이브러리 로드 (이미지 저장 기능) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* 기본 폰트 및 커스텀 색상 변수 설정 */
+        :root {
+            --color-primary: #9f7ee7;
+            --color-secondary: #f33358;
+        }
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            background-color: #f9fafb; /* 배경색 약간 변경 */
+        }
+        /* 커스텀 스타일 */
+        .speech-bubble {
+            background: #f3f4f6; /* 기본 말풍선 색상 */
+            border-radius: .4em;
+            padding: 1.5rem;
+            width: 100%;
+        }
+        .speech-bubble.error {
+            background-color: #fee2e2; /* 핑크톤 에러 배경 */
+        }
+        .speech-bubble.success {
+            background-color: #f0e6ff; /* 퍼플톤 성공 배경 */
+        }
+        /* 체크박스 비활성화 시 스타일 */
+        input[type="checkbox"]:disabled + label {
+            cursor: not-allowed;
+            color: #9ca3af;
+        }
+        input[type="checkbox"]:disabled {
+            background-color: #e5e7eb;
+            border-color: #d1d5db;
+        }
+        /* 로딩 스피너 */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid var(--color-primary);
+            width: 24px;
+            height: 24px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* 움직이는 그라데이션 배경 */
+        .animated-gradient {
+            background: linear-gradient(-45deg, #9f7ee7, #f33358, #a855f7, #ec4899);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <!-- 페이지 제목 -->
+        <header class="text-center mb-12 p-8 rounded-xl shadow-lg animated-gradient text-white">
+            <h1 class="text-3xl md:text-4xl font-bold">개인별 교육과정 설계표</h1>
+            <p class="mt-2 opacity-90">나만의 교육과정을 설계하고 미래를 준비하세요.</p>
+        </header>
+
+        <!-- 학생 정보 입력 -->
+        <section id="student-info" class="bg-white p-6 rounded-xl shadow-md mb-8 max-w-5xl mx-auto">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 text-[#9f7ee7] flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                1. 학생 정보 입력
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 items-end">
+                <div>
+                    <label for="grade" class="block text-sm font-medium text-gray-700 mb-1">학년</label>
+                    <select id="grade" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9f7ee7] focus:border-[#9f7ee7]">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="class-number" class="block text-sm font-medium text-gray-700 mb-1">반</label>
+                    <input type="number" id="class-number" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="예: 5">
+                </div>
+                <div>
+                    <label for="student-number" class="block text-sm font-medium text-gray-700 mb-1">번호</label>
+                    <input type="number" id="student-number" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="예: 12">
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label for="student-name" class="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                    <input type="text" id="student-name" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="예: 홍길동">
+                </div>
+                <div class="col-span-2 md:col-span-5 lg:col-span-1">
+                    <label for="major" class="block text-sm font-medium text-gray-700 mb-1">희망 진로/학과</label>
+                    <input type="text" id="major" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="예: AI 전문가">
+                </div>
+            </div>
+        </section>
+
+        <!-- 교육과정 설계 -->
+        <main class="grid lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+            
+            <!-- 과목 선택 영역 -->
+            <div id="course-selection" class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold mb-6 border-b pb-2 text-[#9f7ee7] flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                    2. 과목 선택
+                </h2>
+                <div id="course-list" class="space-y-8">
+                    <!-- 과목 목록이 여기에 동적으로 생성됩니다. -->
+                </div>
+                
+                <div class="mt-8 pt-6 border-t">
+                    <div class="flex justify-between items-center">
+                        <div id="credit-info" class="text-lg font-bold">
+                            총 이수 학점: <span id="total-credits" class="text-[#9f7ee7]">0</span> 학점
+                        </div>
+                        <button id="submit-btn" class="bg-[#9f7ee7] text-white font-bold py-2 px-6 rounded-lg hover:bg-[#8e68d3] transition-colors disabled:bg-gray-400">
+                            제출하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 선택 과목 및 공동교육과정 -->
+            <aside id="right-panel" class="lg:col-span-1 space-y-8">
+                <div class="sticky top-8">
+                    <!-- 선택한 과목 목록 -->
+                    <div id="selected-courses-container">
+                        <h2 class="text-xl font-semibold mb-4 text-center flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            선택한 과목
+                        </h2>
+                        <div id="selected-courses-table" class="bg-white rounded-xl shadow-md max-h-[45vh] overflow-y-auto">
+                            <!-- 선택한 과목 테이블이 여기에 동적으로 생성됩니다. -->
+                        </div>
+                    </div>
+                    <!-- 공동교육과정 이수 현황 -->
+                    <div id="joint-curriculum-container" class="mt-8">
+                        <h2 class="text-xl font-semibold mb-4 text-center flex items-center justify-center">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            공동교육과정
+                        </h2>
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="joint-category" class="block text-sm font-medium text-gray-700">과목 계열</label>
+                                    <select id="joint-category" class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9f7ee7] focus:border-[#9f7ee7]"></select>
+                                </div>
+                                <div>
+                                    <label for="joint-name" class="block text-sm font-medium text-gray-700">과목명</label>
+                                    <input type="text" id="joint-name" class="mt-1 w-full p-2 border border-gray-300 rounded-lg" placeholder="예: 고급수학">
+                                </div>
+                                <div>
+                                    <label for="joint-credits" class="block text-sm font-medium text-gray-700">학점</label>
+                                    <input type="number" id="joint-credits" class="mt-1 w-full p-2 border border-gray-300 rounded-lg" placeholder="예: 3">
+                                </div>
+                                <button id="add-joint-course-btn" class="w-full bg-[#f33358] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#d92a4a] transition-colors">
+                                    공동교육과정 추가
+                                </button>
+                            </div>
+                            <ul id="joint-courses-list" class="mt-4 space-y-2">
+                                <!-- 추가된 공동교육과정 과목이 여기에 표시됩니다. -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 과목 선택 도우미 -->
+            <aside id="helper" class="lg:col-span-1">
+                <div class="sticky top-8">
+                    <h2 class="text-xl font-semibold mb-4 text-center flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        과목 선택 도우미
+                    </h2>
+                    <div id="helper-message-container">
+                        <div class="speech-bubble w-full">
+                            <div id="helper-message" class="text-gray-700">
+                                안녕하세요! 희망 진로를 입력하면 과목을 추천해 드릴게요. 과목을 선택하면 규칙을 잘 지키고 있는지 알려드릴게요!
+                            </div>
+                            <div id="ai-loader" class="hidden justify-center items-center">
+                                <div class="loader"></div>
+                                <span class="ml-3">진로에 맞는 과목을 분석중입니다...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </main>
+        
+        <!-- 제출 확인 모달 -->
+        <div id="submission-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+            <div class="relative top-10 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 text-center">최종 선택 과목 확인</h3>
+                    <div id="final-selection-container" class="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <!-- 최종 선택 과목 대시보드가 여기에 동적으로 생성됩니다. -->
+                    </div>
+                    <div id="submission-status" class="mt-4 text-center"></div>
+                    <div class="items-center px-4 py-3 mt-4 flex flex-col sm:flex-row-reverse gap-2">
+                        <button id="confirm-submit-btn" class="w-full sm:w-auto px-4 py-2 bg-[#9f7ee7] text-white text-base font-medium rounded-md shadow-sm hover:bg-[#8e68d3] focus:outline-none focus:ring-2 focus:ring-[#c4b5fd]">
+                            제출
+                        </button>
+                        <button id="save-image-btn" class="w-full sm:w-auto px-4 py-2 bg-[#f33358] text-white text-base font-medium rounded-md shadow-sm hover:bg-[#d92a4a] focus:outline-none focus:ring-2 focus:ring-[#fca5a5]">
+                            이미지로 저장하기
+                        </button>
+                         <button id="cancel-submit-btn" class="w-full sm:w-auto mt-2 sm:mt-0 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            취소
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // ===================================================================================
+        // Webflow CMS 데이터 (사용자 제공)
+        // ===================================================================================
+        const RAW_CMS_DATA = [
+              {"subjectName": "공통국어 1", "slug": "gongtonggwamog", "grade": "1", "semester": "1"},
+              {"subjectName": "공통국어 2", "slug": "gongtonggugeo-2", "grade": "1", "semester": "2"},
+              {"subjectName": "공통수학1", "slug": "gongtongsuhag1", "grade": "1", "semester": "1"},
+              {"subjectName": "공통수학2", "slug": "gongtongsuhag2", "grade": "1", "semester": "2"},
+              {"subjectName": "공통영어1", "slug": "gongtongyeongeo1", "grade": "1", "semester": "1"},
+              {"subjectName": "공통영어2", "slug": "gongtongyeongeo2", "grade": "1", "semester": "2"},
+              {"subjectName": "통합사회1", "slug": "tonghabsahoe1", "grade": "1", "semester": "1"},
+              {"subjectName": "통합사회2", "slug": "tonghabsahoe2", "grade": "1", "semester": "2"},
+              {"subjectName": "통합과학1", "slug": "tonghabgwahag1", "grade": "1", "semester": "1"},
+              {"subjectName": "통합과학2", "slug": "tonghabgwahag2", "grade": "1", "semester": "2"},
+              {"subjectName": "한국사1", "slug": "hangugsa1", "grade": "1", "semester": "1"},
+              {"subjectName": "한국사2", "slug": "hangugsa2", "grade": "1", "semester": "2"},
+              {"subjectName": "과학탐구실험1", "slug": "gwahagtamgusilheom1", "grade": "1", "semester": "1"},
+              {"subjectName": "과학탐구실험2", "slug": "gwahagtamgusilheom2", "grade": "1", "semester": "2"},
+              {"subjectName": "체육1", "slug": "ceyug1", "grade": "1", "semester": "1"},
+              {"subjectName": "체육2", "slug": "ceyug2", "grade": "1", "semester": "2"},
+              {"subjectName": "음악", "slug": "eumag", "grade": "1", "semester": "1"},
+              {"subjectName": "미술", "slug": "misul", "grade": "1", "semester": "2"},
+              {"subjectName": "문학", "slug": "munhag-f72be", "grade": "2", "semester": "1"},
+              {"subjectName": "독서와작문", "slug": "dokseowajakmun", "grade": "2", "semester": "2"},
+              {"subjectName": "대수", "slug": "daesoo", "grade": "2", "semester": "1"},
+              {"subjectName": "미적분I", "slug": "mijeogbuni", "grade": "2", "semester": "2"},
+              {"subjectName": "영어I", "slug": "yeongeoi", "grade": "2", "semester": "1"},
+              {"subjectName": "영어독해와작문", "slug": "yeongeodokhaewajakmun", "grade": "2", "semester": "2"},
+              {"subjectName": "스포츠문화", "slug": "sportsmunhwa", "grade": "2", "semester": "1"},
+              {"subjectName": "스포츠과학", "slug": "sportsgwahak", "grade": "2", "semester": "2"},
+              {"subjectName": "스포츠생활1", "slug": "sportssaenghwal1", "grade": "3", "semester": "1"},
+              {"subjectName": "스포츠생활2", "slug": "sportssaenghwal2", "grade": "3", "semester": "2"},
+              {"subjectName": "주제탐구독서", "slug": "jujetamgudokseo", "grade": "2", "semester": "1"},
+              {"subjectName": "인공지능수학", "slug": "ingongjineungsuhak", "grade": "2", "semester": "1"},
+              {"subjectName": "세계문화와영어", "slug": "segyemunhwawayeongeo", "grade": "2", "semester": "1"},
+              {"subjectName": "물리학", "slug": "mulrihag", "grade": "2", "semester": "1"},
+              {"subjectName": "화학", "slug": "hwahag", "grade": "2", "semester": "1"},
+              {"subjectName": "생명과학", "slug": "saengmyeonggwahag", "grade": "2", "semester": "1"},
+              {"subjectName": "지구과학", "slug": "jigugwahag", "grade": "2", "semester": "1"},
+              {"subjectName": "세계사", "slug": "segyesa", "grade": "2", "semester": "1"},
+              {"subjectName": "세계시민과 지리", "slug": "segyesimingwajiri", "grade": "2", "semester": "1"},
+              {"subjectName": "법과사회", "slug": "beopgwasahoe", "grade": "2", "semester": "1"},
+              {"subjectName": "인문학과윤리", "slug": "inmunhakgwayunri", "grade": "2", "semester": "1"},
+              {"subjectName": "일본어", "slug": "ilboneo", "grade": "2", "semester": "1"},
+              {"subjectName": "중국어", "slug": "junggugeo", "grade": "2", "semester": "1"},
+              {"subjectName": "한문", "slug": "hanmun", "grade": "2", "semester": "1"},
+              {"subjectName": "미술창작", "slug": "misulchangjak", "grade": "2", "semester": "1"},
+              {"subjectName": "문학과영상", "slug": "munhakgwayeongsang", "grade": "2", "semester": "2"},
+              {"subjectName": "언어생활탐구", "slug": "eoneosaenghwaltamgu", "grade": "2", "semester": "2"},
+              {"subjectName": "기하", "slug": "giha", "grade": "2", "semester": "2"},
+              {"subjectName": "미디어영어", "slug": "midieoyeongeo", "grade": "2", "semester": "2"},
+              {"subjectName": "사회와문화", "slug": "sahoewamunhwa", "grade": "2", "semester": "2"},
+              {"subjectName": "현대사회와윤리", "slug": "hyeondaesahoewayunri", "grade": "2", "semester": "2"},
+              {"subjectName": "도시의미래탐구", "slug": "hyeondaesadosiuimiraetamguhoewayunri", "grade": "2", "semester": "2"},
+              {"subjectName": "동아시아역사기행", "slug": "dongasiayeoksagihaeng", "grade": "2", "semester": "2"},
+              {"subjectName": "역학과 에너지", "slug": "yeoghaggwa-eneoji", "grade": "2", "semester": "2"},
+              {"subjectName": "물질과 에너지", "slug": "muljilgwa-eneoji", "grade": "2", "semester": "2"},
+              {"subjectName": "세포와 물질대사", "slug": "sepowa-muljildaesa", "grade": "2", "semester": "2"},
+              {"subjectName": "지구시스템과학", "slug": "jigusiseutemgwahag", "grade": "2", "semester": "2"},
+              {"subjectName": "음악감상과비평", "slug": "eumakgamsanggwabipyeong", "grade": "2", "semester": "2"},
+              {"subjectName": "정보", "slug": "jeongbo", "grade": "2", "semester": "2"},
+              {"subjectName": "인간과 심리", "slug": "ingangwa-simri", "grade": "2", "semester": "2"},
+              {"subjectName": "화법과언어", "slug": "hwabeopgwaeoneo", "grade": "3", "semester": "1"},
+              {"subjectName": "독서토론과 글쓰기", "slug": "dokseotorongwa-geulssgi", "grade": "3", "semester": "1"},
+              {"subjectName": "미적분II", "slug": "mijeogbunii", "grade": "3", "semester": "1"},
+              {"subjectName": "확률과 통계", "slug": "hwagryulgwa-tonggye", "grade": "3", "semester": "1"},
+              {"subjectName": "경제수학", "slug": "gyeongjesuhak", "grade": "3", "semester": "1"},
+              {"subjectName": "영어발표와토론", "slug": "yeongeobalpyowatoron", "grade": "3", "semester": "1"},
+              {"subjectName": "영어II", "slug": "yeongeoii", "grade": "3", "semester": "1"},
+              {"subjectName": "정치", "slug": "jeongchi", "grade": "3", "semester": "1"},
+              {"subjectName": "한국지리탐구", "slug": "hangukjiritamgu", "grade": "3", "semester": "1"},
+              {"subjectName": "윤리와사상", "slug": "yunriwasasang", "grade": "3", "semester": "1"},
+              {"subjectName": "역사로 탐구하는 현대세계", "slug": "yeoksaro-tamguhaneun-hyeondaesegye", "grade": "3", "semester": "1"},
+              {"subjectName": "전자기와 양자", "slug": "jeonjagiwa-yangja", "grade": "3", "semester": "1"},
+              {"subjectName": "화학 반응의 세계", "slug": "hwahag-baneungyi-segye", "grade": "3", "semester": "1"},
+              {"subjectName": "생물의 유전", "slug": "saengmulyi-yujeon", "grade": "3", "semester": "1"},
+              {"subjectName": "행성우주과학", "slug": "haengseongujugwahag", "grade": "3", "semester": "1"},
+              {"subjectName": "미술과 매체", "slug": "misulgwa-maeche", "grade": "3", "semester": "1"},
+              {"subjectName": "데이터과학", "slug": "deiteogwahak", "grade": "3", "semester": "1"},
+              {"subjectName": "교육의이해", "slug": "gyoyuguiihae", "grade": "3", "semester": "1"},
+              {"subjectName": "보건", "slug": "bogeon", "grade": "3", "semester": "1"},
+              {"subjectName": "마케팅과광고", "slug": "maketinggwagwanggo", "grade": "3", "semester": "1"},
+              {"subjectName": "매체의사소통", "slug": "maecheuisasotong", "grade": "3", "semester": "2"},
+              {"subjectName": "수학과문화", "slug": "suhakgwamunhwa", "grade": "3", "semester": "2"},
+              {"subjectName": "실생활 영어 회화", "slug": "silsaenghwal-yeongeo-hoehwa", "grade": "3", "semester": "2"},
+              {"subjectName": "세계문화와영어", "slug": "segyemunhwawayeongeo", "grade": "3", "semester": "2"},
+              {"subjectName": "사회문제탐구", "slug": "sahoemunjetamgu", "grade": "3", "semester": "2"},
+              {"subjectName": "여행지리", "slug": "yeohaengjiri", "grade": "3", "semester": "2"},
+              {"subjectName": "윤리문제탐구", "slug": "yunrimunjetamgu", "grade": "3", "semester": "2"},
+              {"subjectName": "음악과 미디어", "slug": "eumakgwa-midieo", "grade": "3", "semester": "2"},
+              {"subjectName": "생태와 환경", "slug": "saengtaewa-hwangyeong", "grade": "3", "semester": "2"},
+              {"subjectName": "인간과 철학", "slug": "ingangwa-cheolhak", "grade": "3", "semester": "2"},
+              {"subjectName": "교육의이해", "slug": "gyoyuguiihae", "grade": "3", "semester": "2"},
+              {"subjectName": "보건", "slug": "bogeon", "grade": "3", "semester": "2"},
+              {"subjectName": "인간과 경제활동", "slug": "ingangwa-gyeongjehwaldong", "grade": "3", "semester": "2"},
+              {"subjectName": "직무의사소통", "slug": "jikmuisasotong", "grade": "3", "semester": "2"},
+              {"subjectName": "직무영어", "slug": "jikmuyeongeo", "grade": "3", "semester": "2"},
+              {"subjectName": "직무수학", "slug": "jikmusuhak", "grade": "3", "semester": "2"},
+              {"subjectName": "기후변화와 환경생태", "slug": "gihubyeonhwawa-hwangyeongsaengtae", "grade": "3", "semester": "2"},
+              {"subjectName": "과학의 역사와 문화", "slug": "gwahagui-yeoksawa-munhwa", "grade": "3", "semester": "2"},
+            ];
+
+        // ===================================================================================
+        // 중요: CMS 데이터 보강 로직
+        // ===================================================================================
+        const courseDetails = {
+            'gongtonggwamog': { credits: 4, category: '기초교과', subCategory: '국어', required: true, offered: true },
+            'gongtonggugeo-2': { credits: 4, category: '기초교과', subCategory: '국어', required: true, offered: true },
+            'gongtongsuhag1': { credits: 4, category: '기초교과', subCategory: '수학', required: true, offered: true },
+            'gongtongsuhag2': { credits: 4, category: '기초교과', subCategory: '수학', required: true, offered: true },
+            'gongtongyeongeo1': { credits: 4, category: '기초교과', subCategory: '영어', required: true, offered: true },
+            'gongtongyeongeo2': { credits: 4, category: '기초교과', subCategory: '영어', required: true, offered: true },
+            'tonghabsahoe1': { credits: 4, category: '탐구교과', subCategory: '사회', required: true, offered: true },
+            'tonghabsahoe2': { credits: 4, category: '탐구교과', subCategory: '사회', required: true, offered: true },
+            'tonghabgwahag1': { credits: 4, category: '탐구교과', subCategory: '과학', required: true, offered: true },
+            'tonghabgwahag2': { credits: 4, category: '탐구교과', subCategory: '과학', required: true, offered: true },
+            'hangugsa1': { credits: 3, category: '기초교과', subCategory: '사회', required: true, offered: true },
+            'hangugsa2': { credits: 3, category: '기초교과', subCategory: '사회', required: true, offered: true },
+            'gwahagtamgusilheom1': { credits: 1, category: '탐구교과', subCategory: '과학', required: true, offered: true },
+            'gwahagtamgusilheom2': { credits: 1, category: '탐구교과', subCategory: '과학', required: true, offered: true },
+            'ceyug1': { credits: 2, category: '체육교과', subCategory: '체육', required: true, offered: true },
+            'ceyug2': { credits: 2, category: '체육교과', subCategory: '체육', required: true, offered: true },
+            'eumag': { credits: 3, category: '예술교과', subCategory: '예술', required: true, offered: true },
+            'misul': { credits: 3, category: '예술교과', subCategory: '예술', required: true, offered: true },
+            'munhag-f72be': { credits: 4, category: '기초교과', subCategory: '국어', required: true, offered: true },
+            'dokseowajakmun': { credits: 4, category: '기초교과', subCategory: '국어', required: true, offered: true },
+            'daesoo': { credits: 4, category: '기초교과', subCategory: '수학', required: true, offered: true },
+            'mijeogbuni': { credits: 4, category: '기초교과', subCategory: '수학', required: true, offered: true },
+            'yeongeoi': { credits: 4, category: '기초교과', subCategory: '영어', required: true, offered: true },
+            'yeongeodokhaewajakmun': { credits: 4, category: '기초교과', subCategory: '영어', required: true, offered: true },
+            'sportsmunhwa': { credits: 1, category: '체육교과', subCategory: '체육', required: true, offered: true },
+            'sportsgwahak': { credits: 1, category: '체육교과', subCategory: '체육', required: true, offered: true },
+            'sportssaenghwal1': { credits: 2, category: '체육교과', subCategory: '체육', required: true, offered: true },
+            'sportssaenghwal2': { credits: 2, category: '체육교과', subCategory: '체육', required: true, offered: true },
+            'jujetamgudokseo': { credits: 4, category: '기초교과', subCategory: '국어', required: false, offered: true },
+            'ingongjineungsuhak': { credits: 4, category: '기초교과', subCategory: '수학', required: false, offered: true },
+            'segyemunhwawayeongeo': { credits: 4, category: '기초교과', subCategory: '영어', required: false, offered: true },
+            'mulrihag': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true },
+            'hwahag': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true },
+            'saengmyeonggwahag': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true },
+            'jigugwahag': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true },
+            'segyesa': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'segyesimingwajiri': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'beopgwasahoe': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'inmunhakgwayunri': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'ilboneo': { credits: 4, category: '제2외국어교과', subCategory: '제2외국어', required: false, offered: true },
+            'junggugeo': { credits: 4, category: '제2외국어교과', subCategory: '제2외국어', required: false, offered: true },
+            'hanmun': { credits: 4, category: '제2외국어교과', subCategory: '제2외국어', required: false, offered: true },
+            'misulchangjak': { credits: 4, category: '예술교과', subCategory: '예술', required: false, offered: true },
+            'munhakgwayeongsang': { credits: 4, category: '기초교과', subCategory: '국어', required: false, offered: true },
+            'eoneosaenghwaltamgu': { credits: 4, category: '기초교과', subCategory: '국어', required: false, offered: true },
+            'giha': { credits: 4, category: '기초교과', subCategory: '수학', required: false, offered: true },
+            'midieoyeongeo': { credits: 4, category: '기초교과', subCategory: '영어', required: false, offered: true },
+            'sahoewamunhwa': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'hyeondaesahoewayunri': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'hyeondaesadosiuimiraetamguhoewayunri': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'dongasiayeoksagihaeng': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'yeoghaggwa-eneoji': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true, prerequisites: ['mulrihag'] },
+            'muljilgwa-eneoji': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true, prerequisites: ['hwahag'] },
+            'sepowa-muljildaesa': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true, prerequisites: ['saengmyeonggwahag'] },
+            'jigusiseutemgwahag': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true, prerequisites: ['jigugwahag'] },
+            'eumakgamsanggwabipyeong': { credits: 4, category: '예술교과', subCategory: '예술', required: false, offered: true },
+            'jeongbo': { credits: 4, category: '기술가정교과', subCategory: '정보', required: false, offered: true },
+            'ingangwa-simri': { credits: 4, category: '교양교과', subCategory: '교양', required: false, offered: true },
+            'hwabeopgwaeoneo': { credits: 4, category: '기초교과', subCategory: '국어', required: false, offered: true },
+            'dokseotorongwa-geulssgi': { credits: 4, category: '기초교과', subCategory: '국어', required: false, offered: true },
+            'mijeogbunii': { credits: 4, category: '기초교과', subCategory: '수학', required: false, offered: true, prerequisites: ['mijeogbuni'] },
+            'hwagryulgwa-tonggye': { credits: 4, category: '기초교과', subCategory: '수학', required: false, offered: true },
+            'gyeongjesuhak': { credits: 4, category: '기초교과', subCategory: '수학', required: false, offered: true },
+            'yeongeobalpyowatoron': { credits: 4, category: '기초교과', subCategory: '영어', required: false, offered: true },
+            'yeongeoii': { credits: 4, category: '기초교과', subCategory: '영어', required: false, offered: true },
+            'jeongchi': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'hangukjiritamgu': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'yunriwasasang': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'yeoksaro-tamguhaneun-hyeondaesegye': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'jeonjagiwa-yangja': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true, prerequisites: ['mulrihag'] },
+            'hwahag-baneungyi-segye': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true, prerequisites: ['hwahag'] },
+            'saengmulyi-yujeon': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true, prerequisites: ['saengmyeonggwahag'] },
+            'haengseongujugwahag': { credits: 4, category: '탐구교과', subCategory: '과학', required: false, offered: true, prerequisites: ['jigugwahag'] },
+            'misulgwa-maeche': { credits: 4, category: '예술교과', subCategory: '예술', required: false, offered: true },
+            'deiteogwahak': { credits: 4, category: '기술가정교과', subCategory: '정보', required: false, offered: true },
+            'gyoyuguiihae': { credits: 4, category: '교양교과', subCategory: '교양', required: false, offered: true },
+            'bogeon': { credits: 4, category: '교양교과', subCategory: '교양', required: false, offered: true },
+            'maketinggwagwanggo': { credits: 4, category: '기술가정교과', subCategory: '정보', required: false, offered: true },
+            'maecheuisasotong': { credits: 4, category: '기초교과', subCategory: '국어', required: false, offered: true },
+            'suhakgwamunhwa': { credits: 4, category: '기초교과', subCategory: '수학', required: false, offered: true },
+            'silsaenghwal-yeongeo-hoehwa': { credits: 4, category: '기초교과', subCategory: '영어', required: false, offered: true },
+            'sahoemunjetamgu': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'yeohaengjiri': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'yunrimunjetamgu': { credits: 4, category: '탐구교과', subCategory: '사회', required: false, offered: true },
+            'eumakgwa-midieo': { credits: 4, category: '예술교과', subCategory: '예술', required: false, offered: true },
+            'saengtaewa-hwangyeong': { credits: 4, category: '교양교과', subCategory: '교양', required: false, offered: true },
+            'ingangwa-cheolhak': { credits: 4, category: '교양교과', subCategory: '교양', required: false, offered: true },
+            'ingangwa-gyeongjehwaldong': { credits: 4, category: '교양교과', subCategory: '교양', required: false, offered: true },
+            'jikmuisasotong': { credits: 3, category: '기초교과', subCategory: '국어', required: false, offered: true },
+            'jikmuyeongeo': { credits: 3, category: '기초교과', subCategory: '영어', required: false, offered: true },
+            'jikmusuhak': { credits: 3, category: '기초교과', subCategory: '수학', required: false, offered: true },
+            'gihubyeonhwawa-hwangyeongsaengtae': { credits: 3, category: '탐구교과', subCategory: '과학', required: false, offered: true },
+            'gwahagui-yeoksawa-munhwa': { credits: 3, category: '탐구교과', subCategory: '과학', required: false, offered: true },
+        };
+
+        const PROCESSED_COURSES = RAW_CMS_DATA.map(course => {
+            const details = courseDetails[course.slug.trim()] || {};
+            return {
+                id: course.slug.trim(),
+                name: course.subjectName,
+                grade: course.grade === '-' ? 0 : parseInt(course.grade, 10),
+                semester: course.semester === '-' ? 0 : parseInt(course.semester, 10),
+                credits: details.credits || 3,
+                category: details.category || '기타',
+                subCategory: details.subCategory || '기타',
+                required: details.required || false,
+                offered: details.offered !== undefined ? details.offered : true,
+                prerequisites: details.prerequisites || [],
+            };
+        });
+
+        // ===================================================================================
+        // 애플리케이션 로직
+        // ===================================================================================
+        
+        const courseListContainer = document.getElementById('course-list');
+        const totalCreditsSpan = document.getElementById('total-credits');
+        const helperMessage = document.getElementById('helper-message');
+        const majorInput = document.getElementById('major');
+        const aiLoader = document.getElementById('ai-loader');
+        const helperMessageContainer = document.getElementById('helper-message-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const submissionModal = document.getElementById('submission-modal');
+        const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+        const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
+        const submissionStatus = document.getElementById('submission-status');
+        const selectedCoursesTableContainer = document.getElementById('selected-courses-table');
+        const finalSelectionContainer = document.getElementById('final-selection-container');
+        const saveImageBtn = document.getElementById('save-image-btn');
+        
+        const jointCategorySelect = document.getElementById('joint-category');
+        const jointNameInput = document.getElementById('joint-name');
+        const jointCreditsInput = document.getElementById('joint-credits');
+        const addJointCourseBtn = document.getElementById('add-joint-course-btn');
+        const jointCoursesList = document.getElementById('joint-courses-list');
+
+        let jointCourses = [];
+
+        const selectionLimits = {
+            '2-1': { max: 4, label: '선택과목 중 최대 4개 선택' },
+            '2-2': { max: 4, label: '선택과목 중 최대 4개 선택' },
+            '3-1': { max: 7, label: '선택과목 중 최대 7개 선택' },
+            '3-2': { max4: 5, max3: 2, label: '선택과목 중 4학점 5개, 3학점 2개 선택' }
+        };
+        
+        const duplicateCourseNames = ['교육의이해', '보건', '세계문화와영어'];
+
+        function renderCourses() {
+            courseListContainer.innerHTML = '';
+            const gradeSemesterPairs = [
+                {grade: 1, semester: 1}, {grade: 1, semester: 2},
+                {grade: 2, semester: 1}, {grade: 2, semester: 2},
+                {grade: 3, semester: 1}, {grade: 3, semester: 2},
+            ];
+            
+            gradeSemesterPairs.forEach(({ grade, semester }) => {
+                const coursesForGroup = PROCESSED_COURSES.filter(c => c.grade === grade && c.semester === semester && c.offered);
+                if (coursesForGroup.length === 0) return;
+
+                const groupKey = `${grade}-${semester}`;
+                const limit = selectionLimits[groupKey];
+
+                const groupSection = document.createElement('div');
+                groupSection.id = `group-${groupKey}`;
+
+                const titleContainer = document.createElement('div');
+                titleContainer.className = 'flex justify-between items-baseline';
+                
+                const title = document.createElement('h3');
+                title.className = 'text-lg font-semibold text-[#9f7ee7]';
+                title.textContent = `${grade}학년 ${semester}학기`;
+                titleContainer.appendChild(title);
+
+                if (limit) {
+                    const guidance = document.createElement('p');
+                    guidance.className = 'text-sm text-gray-500';
+                    guidance.textContent = limit.label;
+                    titleContainer.appendChild(guidance);
+                }
+                
+                groupSection.appendChild(titleContainer);
+
+                const courseGrid = document.createElement('div');
+                courseGrid.className = 'grid sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2 border-t pt-4';
+
+                coursesForGroup.forEach(course => {
+                    const courseEl = document.createElement('div');
+                    courseEl.className = 'flex items-center p-3 bg-gray-50 rounded-lg border';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `course-${course.id}`;
+                    checkbox.value = course.id;
+                    checkbox.dataset.isRequired = course.required;
+                    checkbox.dataset.name = course.name; // 중복 과목 식별을 위해 name 추가
+                    checkbox.className = 'h-5 w-5 rounded border-gray-300 text-[#9f7ee7] focus:ring-[#9f7ee7]';
+                    
+                    if (course.required) {
+                        checkbox.checked = true;
+                        checkbox.disabled = true;
+                    }
+
+                    const label = document.createElement('label');
+                    label.htmlFor = `course-${course.id}`;
+                    label.className = 'ml-3 block text-sm font-medium text-gray-800 flex-1';
+                    label.textContent = `${course.name} (${course.credits}학점)`;
+
+                    courseEl.appendChild(checkbox);
+                    courseEl.appendChild(label);
+                    courseGrid.appendChild(courseEl);
+                });
+
+                groupSection.appendChild(courseGrid);
+                courseListContainer.appendChild(groupSection);
+            });
+
+            courseListContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', calculateAndValidate);
+            });
+        }
+
+        function applySelectionLimits() {
+            const selectedCourses = getSelectedCourses();
+            const selectedCourseNames = new Set(selectedCourses.map(c => c.name));
+
+            // 1. 모든 선택 가능한 체크박스를 일단 활성화 (필수과목 제외)
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                if(cb.dataset.isRequired !== 'true') {
+                    cb.disabled = false;
+                }
+            });
+
+            // 2. 중복 과목 선택 제한 적용 (UI 비활성화)
+            duplicateCourseNames.forEach(name => {
+                if (selectedCourseNames.has(name)) {
+                    document.querySelectorAll(`input[data-name="${name}"]`).forEach(cb => {
+                        if (!cb.checked) {
+                            cb.disabled = true;
+                        }
+                    });
+                }
+            });
+
+            // 3. 학기별 선택 제한 적용
+            for (const key in selectionLimits) {
+                const [grade, semester] = key.split('-').map(Number);
+                const limit = selectionLimits[key];
+                const groupContainer = document.getElementById(`group-${grade}-${semester}`);
+                if (!groupContainer) continue;
+
+                const checkboxesInGroup = groupContainer.querySelectorAll('input[type="checkbox"]');
+                
+                // 해당 학기 그룹 내에서 '실제로 체크된' 선택과목만 카운트
+                const selectedOptionalInGroup = Array.from(checkboxesInGroup).filter(cb => cb.checked && cb.dataset.isRequired !== 'true');
+
+                if (key === '3-2') {
+                    const selected4Credits = selectedOptionalInGroup.filter(cb => PROCESSED_COURSES.find(c => c.id === cb.value).credits === 4).length;
+                    const selected3Credits = selectedOptionalInGroup.filter(cb => PROCESSED_COURSES.find(c => c.id === cb.value).credits === 3).length;
+
+                    checkboxesInGroup.forEach(cb => {
+                        if (!cb.checked && cb.dataset.isRequired !== 'true') {
+                            const course = PROCESSED_COURSES.find(c => c.id === cb.value);
+                            if (course.credits === 4 && selected4Credits >= limit.max4) {
+                                cb.disabled = true;
+                            }
+                            if (course.credits === 3 && selected3Credits >= limit.max3) {
+                                cb.disabled = true;
+                            }
+                        }
+                    });
+                } else {
+                    if (selectedOptionalInGroup.length >= limit.max) {
+                        checkboxesInGroup.forEach(cb => {
+                            if (!cb.checked && cb.dataset.isRequired !== 'true') {
+                                cb.disabled = true;
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        function renderSelectedCoursesTable(container, includeRequired = true) {
+            const coursesToRender = includeRequired ? getSelectedCourses() : getSelectedCourses().filter(c => !c.required);
+
+            if (coursesToRender.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 p-4">선택한 과목이 없습니다.</p>';
+                return;
+            }
+
+            const groupedCourses = coursesToRender.reduce((acc, course) => {
+                const key = `${course.grade}-${course.semester}`;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(course);
+                return acc;
+            }, {});
+
+            let tableHtml = `
+                <div class="relative">
+                    <table class="w-full text-sm text-left text-gray-700">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0 z-10">
+                            <tr>
+                                <th scope="col" class="px-4 py-3">과목명</th>
+                                <th scope="col" class="px-2 py-3 text-center">학점</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            const sortedKeys = Object.keys(groupedCourses).sort((a, b) => {
+                const [gradeA, semA] = a.split('-').map(Number);
+                const [gradeB, semB] = b.split('-').map(Number);
+                if (gradeA !== gradeB) return gradeA - gradeB;
+                return semA - semB;
+            });
+
+            for (const key of sortedKeys) {
+                const [grade, semester] = key.split('-');
+                const coursesInGroup = groupedCourses[key];
+                
+                tableHtml += `
+                    <tr class="bg-[#f0e6ff] border-b">
+                        <th colspan="2" class="px-4 py-2 font-bold text-[#9f7ee7]">${grade}학년 ${semester}학기</th>
+                    </tr>
+                `;
+
+                coursesInGroup.sort((a,b) => a.name.localeCompare(b.name)).forEach(course => {
+                    tableHtml += `
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-4 py-2">${course.name}</td>
+                            <td class="px-2 py-2 text-center">${course.credits}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            tableHtml += `</tbody></table></div>`;
+            container.innerHTML = tableHtml;
+        }
+
+        function renderFinalDashboard() {
+            const selectedCourses = getSelectedCourses();
+            
+            let dashboardHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">';
+
+            if (selectedCourses.length === 0 && jointCourses.length === 0) {
+                finalSelectionContainer.innerHTML = '<p class="text-center text-gray-500 p-4">선택한 과목이 없습니다.</p>';
+                return;
+            }
+
+            const groupedCourses = selectedCourses.reduce((acc, course) => {
+                const key = `${course.grade}-${course.semester}`;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(course);
+                return acc;
+            }, {});
+
+            const sortedKeys = Object.keys(groupedCourses).sort((a, b) => {
+                const [gradeA, semA] = a.split('-').map(Number);
+                const [gradeB, semB] = b.split('-').map(Number);
+                if (gradeA !== gradeB) return gradeA - gradeB;
+                return semA - semB;
+            });
+
+            for (const key of sortedKeys) {
+                const [grade, semester] = key.split('-');
+                const coursesInGroup = groupedCourses[key];
+                
+                dashboardHtml += `
+                    <div class="bg-white p-4 rounded-lg border">
+                        <h4 class="font-bold text-md text-[#9f7ee7] mb-2 border-b pb-2">${grade}학년 ${semester}학기</h4>
+                        <ul class="space-y-1 text-sm">
+                `;
+
+                coursesInGroup.sort((a,b) => a.name.localeCompare(b.name)).forEach(course => {
+                    dashboardHtml += `<li class="flex justify-between"><span>${course.name}</span> <span class="text-gray-500">${course.credits}학점</span></li>`;
+                });
+
+                dashboardHtml += `</ul></div>`;
+            }
+
+            if (jointCourses.length > 0) {
+                dashboardHtml += `
+                    <div class="bg-white p-4 rounded-lg border">
+                        <h4 class="font-bold text-md text-[#f33358] mb-2 border-b pb-2">공동교육과정</h4>
+                        <ul class="space-y-1 text-sm">
+                `;
+                jointCourses.forEach(course => {
+                    dashboardHtml += `<li class="flex justify-between"><span>${course.name}</span> <span class="text-gray-500">${course.credits}학점</span></li>`;
+                });
+                dashboardHtml += `</ul></div>`;
+            }
+
+            dashboardHtml += '</div>';
+            finalSelectionContainer.innerHTML = dashboardHtml;
+        }
+
+        function calculateAndValidate() {
+            applySelectionLimits();
+            renderSelectedCoursesTable(selectedCoursesTableContainer, true);
+
+            const selectedSchoolCourses = getSelectedCourses();
+            
+            let totalCredits = 0;
+            let basicCredits = 0;
+            let artCredits = 0;
+
+            const countedCourseNames = new Set();
+
+            // 학교 선택 과목 계산 (중복 제외)
+            selectedSchoolCourses.forEach(course => {
+                if (duplicateCourseNames.includes(course.name)) {
+                    if (!countedCourseNames.has(course.name)) {
+                        totalCredits += course.credits;
+                        countedCourseNames.add(course.name);
+                    }
+                } else {
+                    totalCredits += course.credits;
+                }
+                
+                if (['국어', '영어', '수학'].includes(course.subCategory)) {
+                    basicCredits += course.credits;
+                }
+                if (course.category === '예술교과') {
+                    artCredits += course.credits;
+                }
+            });
+
+            // 공동교육과정 과목 계산
+            jointCourses.forEach(course => {
+                totalCredits += course.credits;
+                if (['국어', '영어', '수학'].includes(course.subCategory)) {
+                    basicCredits += course.credits;
+                }
+                if (course.subCategory === '예술') {
+                    artCredits += course.credits;
+                }
+            });
+
+            totalCreditsSpan.textContent = totalCredits;
+
+            let errorMessages = [];
+            
+            if (totalCredits < 174) {
+                errorMessages.push(`졸업에 필요한 총 이수 학점(174학점)이 부족해요. ${174 - totalCredits}학점 더 선택해주세요.`);
+            }
+            if (totalCredits > 0 && basicCredits > (totalCredits * 0.5)) {
+                errorMessages.push('기초교과의 학점은 50%를 넘길 수 없어요. 기초교과(국어, 영어, 수학)를 덜어내주세요.');
+            }
+            if (artCredits < 10) {
+                errorMessages.push('졸업에 필요한 예술교과 이수 학점이 부족해요. 예술교과를 추가신청해주세요.');
+            }
+
+            const selectedCourseIds = selectedSchoolCourses.map(c => c.id);
+            const prerequisiteErrors = new Set();
+
+            selectedSchoolCourses.forEach(course => {
+                if (course.prerequisites && course.prerequisites.length > 0) {
+                    const hasPrereq = course.prerequisites.every(prereqId => selectedCourseIds.includes(prereqId));
+                    if (!hasPrereq) {
+                        prerequisiteErrors.add('과목 간 위계가 지켜지지 않았어요. 선이수과목을 함께 신청해주세요.');
+                    }
+                }
+            });
+            
+            errorMessages = [...errorMessages, ...Array.from(prerequisiteErrors)];
+
+            if (errorMessages.length > 0) {
+                updateHelperMessage(errorMessages.join('<br><br>'), 'error');
+            } else {
+                updateHelperMessage('훌륭해요! 모든 규칙을 잘 지키고 있어요. 이대로 제출해도 좋습니다.', 'success');
+            }
+        }
+
+        function getSelectedCourses() {
+            const selectedIds = Array.from(courseListContainer.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+            return PROCESSED_COURSES.filter(course => selectedIds.includes(course.id));
+        }
+
+        function updateHelperMessage(message, type = 'info') {
+            aiLoader.classList.add('hidden');
+            helperMessage.classList.remove('hidden');
+            helperMessage.innerHTML = message;
+            
+            const bubble = helperMessageContainer.querySelector('.speech-bubble');
+            bubble.classList.remove('error', 'success');
+            if (type === 'error') {
+                bubble.classList.add('error');
+            } else if (type === 'success') {
+                bubble.classList.add('success');
+            }
+        }
+        
+        // 공동교육과정 로직
+        function setupJointCurriculum() {
+            const subCategories = [...new Set(PROCESSED_COURSES.map(c => c.subCategory))];
+            jointCategorySelect.innerHTML = subCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+
+            addJointCourseBtn.addEventListener('click', () => {
+                const name = jointNameInput.value.trim();
+                const credits = parseInt(jointCreditsInput.value, 10);
+                const subCategory = jointCategorySelect.value;
+
+                if (name && credits > 0) {
+                    jointCourses.push({ id: `joint-${Date.now()}`, name, credits, subCategory });
+                    jointNameInput.value = '';
+                    jointCreditsInput.value = '';
+                    renderJointCourses();
+                    calculateAndValidate();
+                } else {
+                    alert('과목명과 학점을 올바르게 입력해주세요.');
+                }
+            });
+        }
+
+        function renderJointCourses() {
+            jointCoursesList.innerHTML = '';
+            jointCourses.forEach((course, index) => {
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center bg-gray-100 p-2 rounded-md';
+                li.innerHTML = `
+                    <span>${course.name} (${course.credits}학점) - ${course.subCategory}</span>
+                    <button data-index="${index}" class="remove-joint-btn text-red-500 hover:text-red-700 font-bold">&times;</button>
+                `;
+                jointCoursesList.appendChild(li);
+            });
+
+            document.querySelectorAll('.remove-joint-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const indexToRemove = parseInt(e.target.dataset.index, 10);
+                    jointCourses.splice(indexToRemove, 1);
+                    renderJointCourses();
+                    calculateAndValidate();
+                });
+            });
+        }
+
+        // AI 추천 및 제출 로직
+        let debounceTimer;
+        majorInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const major = majorInput.value.trim();
+                if (major && major !== '탐색중') {
+                    getAiRecommendations(major);
+                } else {
+                    updateHelperMessage('안녕하세요! 희망 진로를 입력하면 과목을 추천해 드릴게요. 과목을 선택하면 규칙을 잘 지키고 있는지 알려드릴게요!');
+                }
+            }, 1000);
+        });
+
+        async function getAiRecommendations(major) {
+            helperMessage.classList.add('hidden');
+            aiLoader.classList.remove('hidden');
+
+            const openAIApiKey = "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"; 
+
+            if (openAIApiKey === "YOUR_OPENAI_API_KEY" || !openAIApiKey) {
+                 updateHelperMessage('OpenAI API 키가 설정되지 않았습니다. AI 추천 기능을 사용하려면 스크립트에서 API 키를 입력해주세요.', 'error');
+                 return;
+            }
+
+            const availableCourses = PROCESSED_COURSES
+                .filter(c => !c.required)
+                .map(c => c.name)
+                .join(', ');
+
+            const prompt = `
+                당신은 고등학생의 진로 상담을 도와주는 전문 교육 컨설턴트입니다.
+                학생의 희망 진로는 '${major}'입니다.
+                아래 선택 가능한 과목 목록 중에서, 이 학생의 진로에 가장 도움이 될 만한 과목 7개를 추천하고, 각 과목을 추천하는 이유를 한 문장으로 간결하게 설명해주세요.
+                결과는 "추천 과목:"으로 시작하고, 각 과목은 "과목명: 이유" 형식으로 목록으로 만들어주세요.
+
+                선택 가능 과목 목록: ${availableCourses}
+            `;
+            
+            try {
+                const apiUrl = 'https://api.openai.com/v1/chat/completions';
+                const payload = {
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: prompt }]
+                };
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${openAIApiKey}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`API 요청 실패: ${errorData.error.message}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.choices && result.choices.length > 0) {
+                    const recommendationText = result.choices[0].message.content;
+                    updateHelperMessage(`<strong>[${major}] 맞춤 과목 추천:</strong><br><br>${recommendationText.replace(/\n/g, '<br>')}`, 'info');
+                } else {
+                    throw new Error("API로부터 유효한 응답을 받지 못했습니다.");
+                }
+
+            } catch (error) {
+                console.error('AI 추천 기능 오류:', error);
+                updateHelperMessage(`AI 추천 기능 오류: ${error.message}`, 'error');
+            } finally {
+                aiLoader.classList.add('hidden');
+                helperMessage.classList.remove('hidden');
+            }
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            renderFinalDashboard(); // 팝업창에 대시보드 렌더링
+            submissionModal.classList.remove('hidden');
+            submissionStatus.innerHTML = '';
+            confirmSubmitBtn.disabled = false;
+        });
+
+        cancelSubmitBtn.addEventListener('click', () => {
+            submissionModal.classList.add('hidden');
+        });
+
+        confirmSubmitBtn.addEventListener('click', async () => {
+            confirmSubmitBtn.disabled = true;
+            submissionStatus.innerHTML = `<div class="flex justify-center items-center"><div class="loader"></div><span class="ml-2">제출 중...</span></div>`;
+            await submitToGoogleSheets();
+        });
+
+        saveImageBtn.addEventListener('click', () => {
+            html2canvas(document.getElementById('final-selection-container')).then(canvas => {
+                const dataUrl = canvas.toDataURL('image/png');
+                const newTab = window.open();
+                newTab.document.body.innerHTML = `<img src="${dataUrl}" style="width:100%;">`;
+            });
+        });
+
+        async function submitToGoogleSheets() {
+            const googleAppScriptUrl = 'https://script.google.com/macros/s/AKfycbxE9PLrTwxH--NmF_ymAQHJXkWTOZBxYGY6Vt4aN5Zs0hB3aftR_Um5RizCjthOxy8UeQ/exec';
+
+            if (googleAppScriptUrl === 'YOUR_GOOGLE_APP_SCRIPT_URL') {
+                submissionStatus.innerHTML = `<p class="text-red-500">오류: Google Apps Script URL이 설정되지 않았습니다.</p>`;
+                confirmSubmitBtn.disabled = false;
+                return;
+            }
+
+            const studentSelectedOnly = getSelectedCourses().filter(course => !course.required);
+
+            const dataToSubmit = {
+                timestamp: new Date().toLocaleString('ko-KR'),
+                grade: document.getElementById('grade').value,
+                classNumber: document.getElementById('class-number').value,
+                studentNumber: document.getElementById('student-number').value,
+                studentName: document.getElementById('student-name').value,
+                major: document.getElementById('major').value,
+                selectedSchoolCourses: studentSelectedOnly.map(c => c.name).join(', '),
+                selectedJointCourses: jointCourses.map(c => `${c.name}(${c.credits})`).join(', '),
+            };
+
+            try {
+                await fetch(googleAppScriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToSubmit)
+                });
+                
+                submissionStatus.innerHTML = `<p class="text-green-500">성공적으로 제출되었습니다!</p>`;
+                setTimeout(() => submissionModal.classList.add('hidden'), 2000);
+
+            } catch (error) {
+                console.error('Google Sheets 제출 오류:', error);
+                submissionStatus.innerHTML = `<p class="text-red-500">제출 중 오류가 발생했습니다. 관리자에게 문의하세요.</p>`;
+                confirmSubmitBtn.disabled = false;
+            }
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCourses();
+            setupJointCurriculum();
+            calculateAndValidate();
+        });
+
+    </script>
+    
+</body>
+</html>
